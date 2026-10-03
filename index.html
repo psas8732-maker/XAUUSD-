@@ -8,13 +8,13 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html, body { width: 100%; height: 100%; background-color: #0b0e14; color: #e1e4e8; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; }
-        #app { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
-        header { background: #161b22; padding: 12px 16px; border-bottom: 1px solid #21262d; display: flex; justify-content: space-between; align-items: center; height: 50px; flex-shrink: 0; }
-        .title { font-size: 15px; font-weight: 700; color: #f0883e; letter-spacing: 0.5px; }
-        .status { font-size: 11px; background: rgba(35, 134, 54, 0.2); color: #3fb950; border: 1px solid #238636; padding: 3px 8px; border-radius: 12px; font-weight: 600; }
-        #chart { flex: 1; width: 100%; height: calc(100vh - 50px); position: relative; }
-        .legend { position: absolute; top: 10px; left: 10px; z-index: 10; font-size: 12px; background: rgba(22, 27, 34, 0.85); padding: 8px 12px; border-radius: 6px; border: 1px solid #30363d; backdrop-filter: blur(4px); pointer-events: none; }
-        .legend-item { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+        #app { display: flex; flex-direction: column; height: 100vh; width: 100vw; position: absolute; top: 0; left: 0; bottom: 0; right: 0; }
+        header { background: #161b22; padding: 10px 14px; border-bottom: 1px solid #21262d; display: flex; justify-content: space-between; align-items: center; height: 45px; flex-shrink: 0; z-index: 20; }
+        .title { font-size: 14px; font-weight: 700; color: #f0883e; letter-spacing: 0.5px; }
+        .status { font-size: 10px; background: rgba(35, 134, 54, 0.2); color: #3fb950; border: 1px solid #238636; padding: 2px 6px; border-radius: 10px; font-weight: 600; }
+        #chart { flex: 1; width: 100%; height: calc(100vh - 45px); position: relative; }
+        .legend { position: absolute; top: 8px; left: 8px; z-index: 10; font-size: 11px; background: rgba(22, 27, 34, 0.85); padding: 6px 10px; border-radius: 6px; border: 1px solid #30363d; pointer-events: none; }
+        .legend-item { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
         .legend-item:last-child { margin-bottom: 0; }
         .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
         .dot-supply { background: #f85149; }
@@ -31,8 +31,8 @@
         
         <div id="chart">
             <div class="legend">
-                <div class="legend-item"><span class="dot dot-supply"></span> Supply / Institutional Sell Zone</div>
-                <div class="legend-item"><span class="dot dot-demand"></span> Demand / Institutional Buy Zone</div>
+                <div class="legend-item"><span class="dot dot-supply"></span> Supply / Sell Zone</div>
+                <div class="legend-item"><span class="dot dot-demand"></span> Demand / Buy Zone</div>
             </div>
         </div>
     </div>
@@ -40,8 +40,9 @@
     <script>
         const chartElement = document.getElementById('chart');
         
-        // สร้าง Chart Container ให้เต็มพื้นที่
         const chart = LightweightCharts.createChart(chartElement, {
+            width: chartElement.clientWidth || window.innerWidth,
+            height: chartElement.clientHeight || (window.innerHeight - 45),
             layout: {
                 backgroundColor: '#0b0e14',
                 textColor: '#8b949e',
@@ -63,7 +64,6 @@
             },
         });
 
-        // แท่งเทียน
         const candlestickSeries = chart.addCandlestickSeries({
             upColor: '#2ea043',
             downColor: '#f85149',
@@ -72,9 +72,7 @@
             wickDownColor: '#f85149',
         });
 
-        // สร้างข้อมูลจำลองโครงสร้างราคาทองคำสำหรับแสดงผล Clean UI
         const now = Math.floor(Date.now() / 1000);
-        const day = 86400;
         let basePrice = 2650.00;
         const data = [];
 
@@ -90,10 +88,8 @@
 
         candlestickSeries.setData(data);
 
-        // วาดระดับราคาสำคัญ (Order Block / Liquidity Price Levels)
         const currentPrice = data[data.length - 1].close;
         
-        // Supply Zone Line (Sell Target)
         candlestickSeries.createPriceLine({
             price: currentPrice + 18.5,
             color: '#f85149',
@@ -103,7 +99,6 @@
             title: 'SUPPLY / SELL ZONE',
         });
 
-        // Demand Zone Line (Buy Target)
         candlestickSeries.createPriceLine({
             price: currentPrice - 15.2,
             color: '#2ea043',
@@ -113,13 +108,15 @@
             title: 'DEMAND / BUY ZONE',
         });
 
-        // ปรับขนาด Chart อัตโนมัติเมื่อหมุนหน้าจอหรือรีไซส์
-        window.addEventListener('resize', () => {
+        function resizeChart() {
             chart.applyOptions({
                 width: chartElement.clientWidth,
                 height: chartElement.clientHeight
             });
-        });
+        }
+
+        window.addEventListener('resize', resizeChart);
+        setTimeout(resizeChart, 200);
     </script>
 </body>
 </html>
