@@ -14,8 +14,8 @@
         html, body {
             width: 100%;
             height: 100%;
-            background-color: #0d1117;
-            color: #c9d1d9;
+            background-color: #131722;
+            color: #d1d4dc;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow: hidden;
         }
@@ -25,12 +25,13 @@
             flex-direction: column;
             width: 100vw;
             height: 100vh;
+            height: -webkit-fill-available;
         }
 
         header {
-            background: #161b22;
-            padding: 10px 14px;
-            border-bottom: 1px solid #30363d;
+            background: #1e222d;
+            padding: 0 16px;
+            border-bottom: 1px solid #2a2e39;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -42,37 +43,29 @@
             font-size: 14px;
             font-weight: 700;
             color: #f0883e;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            letter-spacing: 0.5px;
         }
 
         .badge {
-            background: #238636;
+            background: #2962ff;
             color: #ffffff;
             font-size: 10px;
-            padding: 2px 6px;
+            padding: 3px 8px;
             border-radius: 4px;
             font-weight: 600;
         }
 
-        .chart-wrapper {
+        .chart-container {
             flex: 1;
             width: 100%;
             height: calc(100vh - 48px);
             position: relative;
-            background: #0d1117;
         }
 
-        /* TradingView widget forced container */
-        .tradingview-widget-container {
-            width: 100% !important;
-            height: 100% !important;
-        }
-
-        .tradingview-widget-container > div {
-            width: 100% !important;
-            height: 100% !important;
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
     </style>
 </head>
@@ -81,39 +74,11 @@
     <div class="main-layout">
         <header>
             <div class="title">XAUUSD INSTITUTIONAL ZONES</div>
-            <span class="badge">SMC & LIQUIDITY</span>
+            <span class="badge">LIVE CHART</span>
         </header>
         
-        <div class="chart-wrapper">
-            <div class="tradingview-widget-container">
-                <div id="tradingview_xau"></div>
-                <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-                <script type="text/javascript">
-                new TradingView.widget({
-                    "autosize": true,
-                    "symbol": "OANDA:XAUUSD",
-                    "interval": "15",
-                    "timezone": "Asia/Bangkok",
-                    "theme": "dark",
-                    "style": "1",
-                    "locale": "th",
-                    "toolbar_bg": "#161b22",
-                    "enable_publishing": false,
-                    "hide_side_toolbar": false,
-                    "allow_symbol_change": false,
-                    "container_id": "tradingview_xau",
-                    "studies": [
-                        "STD;Pivots%1High%1Low",
-                        "STD;Volume_Profile_Visible_Range"
-                    ],
-                    "disabled_features": [
-                        "header_symbol_search",
-                        "header_compare"
-                    ],
-                    "enabled_features": ["study_templates"]
-                });
-                </script>
-            </div>
+        <div class="chart-container">
+            <iframe src="https://s.tradingview.com/widgetembed/?frameElementId=tradingview_widget&symbol=OANDA%3AXAUUSD&interval=15&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=1e222d&studies=STD%3APivots%251High%251Low&theme=dark&style=1&timezone=Asia%2FBangkok"></iframe>
         </div>
     </div>
 
