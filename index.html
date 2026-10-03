@@ -2,96 +2,53 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>XAUUSD Sniper Liquidity Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XAUUSD Institutional Entry Zones</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #131722; color: #d1d4dc; height: 100vh; display: flex; flex-direction: column; }
-        header { background-color: #1e222d; padding: 12px 16px; border-bottom: 1px solid #2a2e39; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-weight: bold; font-size: 16px; color: #f0b90b; display: flex; align-items: center; gap: 8px; }
-        .tf-selector { display: flex; gap: 6px; }
-        .tf-btn { background: #2a2e39; color: #b2b5be; border: none; padding: 6px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; }
-        .tf-btn.active { background: #2962ff; color: #ffffff; }
-        .info-bar { background: #1e222d; padding: 10px 16px; border-bottom: 1px solid #2a2e39; font-size: 11px; display: flex; justify-content: space-around; text-align: center; }
-        .info-item span { display: block; font-weight: bold; margin-top: 2px; }
-        .info-item .bsl { color: #f23645; }
-        .info-item .ssl { color: #089981; }
-        .info-item .fibo { color: #f0b90b; }
-        .chart-container { flex: 1; width: 100%; position: relative; }
-        #tradingview_widget { width: 100%; height: 100%; }
-        footer { background: #1e222d; padding: 8px 16px; font-size: 10px; text-align: center; color: #787b86; border-top: 1px solid #2a2e39; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; height: 100vh; display: flex; flex-direction: column; }
+        header { background: #161b22; padding: 10px 15px; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
+        h1 { font-size: 16px; color: #f0883e; font-weight: 600; }
+        .badge { background: #238636; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
+        #chart-container { flex: 1; width: 100%; position: relative; }
+        .tradingview-widget-container { height: 100% !important; width: 100% !important; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo">
-            <span>🎯 XAUUSD SNIPER</span>
-        </div>
-        <div class="tf-selector">
-            <button class="tf-btn active" onclick="changeTF('5', this)">M5</button>
-            <button class="tf-btn" onclick="changeTF('15', this)">M15</button>
-            <button class="tf-btn" onclick="changeTF('60', this)">H1</button>
-            <button class="tf-btn" onclick="changeTF('240', this)">H4</button>
-        </div>
+        <h1>XAUUSD ENTRY ZONES</h1>
+        <span class="badge">SMC & Liquidity</span>
     </header>
 
-    <div class="info-bar">
-        <div class="info-item">
-            BSL Zone (รายใหญ่ดัก Sell)
-            <span class="bsl">Sweep High SL</span>
-        </div>
-        <div class="info-item">
-            Fibo Sniper Zone
-            <span class="fibo">0.378 - 0.550</span>
-        </div>
-        <div class="info-item">
-            SSL Zone (รายใหญ่ดัก Buy)
-            <span class="ssl">Sweep Low SL</span>
-        </div>
-    </div>
-
-    <div class="chart-container">
-        <div id="tradingview_widget"></div>
-    </div>
-
-    <footer>
-        ระบบวิเคราะห์ Liquidity & Order Flow สำหรับมือถือโดยเฉพาะ
-    </footer>
-
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-    <script type="text/javascript">
-        let currentTF = "5";
-
-        function loadChart(interval) {
+    <div id="chart-container">
+        <div class="tradingview-widget-container">
+            <div id="tradingview_xau"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+            <script type="text/javascript">
             new TradingView.widget({
                 "autosize": true,
                 "symbol": "OANDA:XAUUSD",
-                "interval": interval,
+                "interval": "15",
                 "timezone": "Asia/Bangkok",
                 "theme": "dark",
                 "style": "1",
                 "locale": "th",
-                "toolbar_bg": "#1e222d",
+                "toolbar_bg": "#161b22",
                 "enable_publishing": false,
                 "hide_side_toolbar": false,
                 "allow_symbol_change": false,
-                "container_id": "tradingview_widget",
+                "container_id": "tradingview_xau",
                 "studies": [
-                    "STD;Pivot%1Points%1High%1Low" // โหลดระบบตรวจจับจุด Swing Liquidity อัตโนมัติ
-                ]
+                    "STD;Pivot%1Points%1High%1Low",
+                    "STD;Volume_Profile_Visible_Range"
+                ],
+                "disabled_features": ["header_symbol_search"],
+                "enabled_features": ["study_templates"]
             });
-        }
+            </script>
+        </div>
+    </div>
 
-        function changeTF(tf, btn) {
-            currentTF = tf;
-            document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            loadChart(tf);
-        }
-
-        // โหลดกราฟครั้งแรก
-        loadChart(currentTF);
-    </script>
 </body>
 </html>
