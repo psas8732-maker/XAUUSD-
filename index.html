@@ -4,13 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>XAUUSD Institutional Zones</title>
-    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.1/dist/lightweight-charts.standalone.production.js"></script>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         html, body {
             width: 100%;
             height: 100%;
-            margin: 0;
-            padding: 0;
             background-color: #0b0e14;
             color: #e1e4e8;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -22,7 +26,8 @@
             flex-direction: column;
             width: 100vw;
             height: 100vh;
-            height: -webkit-fill-available; /* สำหรับ iOS Safari */
+            height: -webkit-fill-available;
+            background-color: #0b0e14;
         }
 
         header {
@@ -54,10 +59,11 @@
         }
 
         #chart-container {
-            flex: 1 1 auto;
+            flex: 1;
             width: 100%;
+            height: calc(100vh - 48px);
             position: relative;
-            background: #0b0e14;
+            background-color: #0b0e14;
         }
 
         .legend {
@@ -112,90 +118,92 @@
     </div>
 
     <script>
-        const container = document.getElementById('chart-container');
-        
-        const chart = LightweightCharts.createChart(container, {
-            width: container.clientWidth,
-            height: container.clientHeight,
-            layout: {
-                backgroundColor: '#0b0e14',
-                textColor: '#8b949e',
-            },
-            grid: {
-                vertLines: { color: '#161b22' },
-                horzLines: { color: '#161b22' },
-            },
-            crosshair: {
-                mode: LightweightCharts.CrosshairMode.Normal,
-            },
-            rightPriceScale: {
-                borderColor: '#30363d',
-            },
-            timeScale: {
-                borderColor: '#30363d',
-                timeVisible: true,
-                secondsVisible: false,
-            },
-        });
+        window.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('chart-container');
+            
+            if (typeof LightweightCharts === 'undefined') {
+                console.error('LightweightCharts library failed to load.');
+                return;
+            }
 
-        const candlestickSeries = chart.addCandlestickSeries({
-            upColor: '#2ea043',
-            downColor: '#f85149',
-            borderVisible: false,
-            wickUpColor: '#2ea043',
-            wickDownColor: '#f85149',
-        });
+            const chart = LightweightCharts.createChart(container, {
+                width: container.clientWidth || window.innerWidth,
+                height: container.clientHeight || (window.innerHeight - 48),
+                layout: {
+                    background: { type: 'solid', color: '#0b0e14' },
+                    textColor: '#8b949e',
+                },
+                grid: {
+                    vertLines: { color: '#161b22' },
+                    horzLines: { color: '#161b22' },
+                },
+                crosshair: {
+                    mode: LightweightCharts.CrosshairMode.Normal,
+                },
+                rightPriceScale: {
+                    borderColor: '#30363d',
+                },
+                timeScale: {
+                    borderColor: '#30363d',
+                    timeVisible: true,
+                    secondsVisible: false,
+                },
+            });
 
-        // จำลองข้อมูลราคา Gold
-        const now = Math.floor(Date.now() / 1000);
-        let basePrice = 2650.00;
-        const data = [];
+            const candlestickSeries = chart.addCandlestickSeries({
+                upColor: '#2ea043',
+                downColor: '#f85149',
+                borderVisible: false,
+                wickUpColor: '#2ea043',
+                wickDownColor: '#f85149',
+            });
 
-        for (let i = 60; i >= 0; i--) {
-            const time = now - (i * 3600);
-            const open = basePrice + (Math.random() - 0.48) * 8;
-            const high = open + Math.random() * 6;
-            const low = open - Math.random() * 6;
-            const close = (high + low) / 2;
-            basePrice = close;
-            data.push({ time, open, high, low, close });
-        }
+            const now = Math.floor(Date.now() / 1000);
+            let basePrice = 2650.00;
+            const data = [];
 
-        candlestickSeries.setData(data);
+            for (let i = 60; i >= 0; i--) {
+                const time = now - (i * 3600);
+                const open = basePrice + (Math.random() - 0.48) * 8;
+                const high = open + Math.random() * 6;
+                const low = open - Math.random() * 6;
+                const close = (high + low) / 2;
+                basePrice = close;
+                data.push({ time, open, high, low, close });
+            }
 
-        const currentPrice = data[data.length - 1].close;
-        
-        // วาดเส้นแนวรับ-แนวต้านหลัก
-        candlestickSeries.createPriceLine({
-            price: currentPrice + 18.5,
-            color: '#f85149',
-            lineWidth: 2,
-            lineStyle: LightweightCharts.LineStyle.Solid,
-            axisLabelVisible: true,
-            title: 'SUPPLY / SELL ZONE',
-        });
+            candlestickSeries.setData(data);
 
-        candlestickSeries.createPriceLine({
-            price: currentPrice - 15.2,
-            color: '#2ea043',
-            lineWidth: 2,
-            lineStyle: LightweightCharts.LineStyle.Solid,
-            axisLabelVisible: true,
-            title: 'DEMAND / BUY ZONE',
-        });
+            const currentPrice = data[data.length - 1].close;
+            
+            candlestickSeries.createPriceLine({
+                price: currentPrice + 18.5,
+                color: '#f85149',
+                lineWidth: 2,
+                lineStyle: LightweightCharts.LineStyle.Solid,
+                axisLabelVisible: true,
+                title: 'SUPPLY / SELL ZONE',
+            });
 
-        // ปรับขนาดความสูงอัตโนมัติให้เต็ม Container
-        function fitChart() {
-            if (container) {
+            candlestickSeries.createPriceLine({
+                price: currentPrice - 15.2,
+                color: '#2ea043',
+                lineWidth: 2,
+                lineStyle: LightweightCharts.LineStyle.Solid,
+                axisLabelVisible: true,
+                title: 'DEMAND / BUY ZONE',
+            });
+
+            function resizeChart() {
                 chart.applyOptions({
                     width: container.clientWidth,
                     height: container.clientHeight
                 });
             }
-        }
 
-        window.addEventListener('resize', fitChart);
-        setTimeout(fitChart, 100);
+            window.addEventListener('resize', resizeChart);
+            setTimeout(resizeChart, 200);
+        });
     </script>
 </body>
 </html>
